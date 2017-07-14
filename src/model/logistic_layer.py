@@ -4,10 +4,10 @@ import time
 import numpy as np
 
 from util.activation_functions import Activation
-from model.layer import Layer
+#from model.layer import Layer
 
 
-class LogisticLayer(Layer):
+class LogisticLayer():
     """
     A layer of perceptrons acting as the output layer
 
@@ -84,9 +84,12 @@ class LogisticLayer(Layer):
         ndarray :
             a numpy array (1,nOut) containing the output of the layer
         """
-        pass
+        self.input[1:,0] = input
+        self.output[:,0] = self.activation(np.matmul(self.weights, self.input))
+        return self.output[0]
 
-    def computeDerivative(self, nextDerivatives, nextWeights):
+
+    def computeDerivative(self, nextDerivatives): #nextWeights):
         """
         Compute the derivatives (back)
 
@@ -102,10 +105,15 @@ class LogisticLayer(Layer):
         ndarray :
             a numpy array containing the partial derivatives on this layer
         """
-        pass
+
+
+        self.delta = Activation.getDerivative(self.activationString)(self.output)*nextDerivatives
+        return np.matmul(self.delta, self.weights)
+
 
     def updateWeights(self):
         """
         Update the weights of the layer
         """
-        pass
+        self.weights = self.weights - 0.01*np.outer(self.delta, self.input)
+

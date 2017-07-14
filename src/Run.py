@@ -45,14 +45,16 @@ def main():
 
     # Do the recognizer
     # Explicitly specify the test set to be evaluated
+    """
     stupidPred = myStupidClassifier.evaluate()
     perceptronPred = myPerceptronClassifier.evaluate()
+    """
     lrPred = myLRClassifier.evaluate()
 
     # Report the result
     print("=========================")
     evaluator = Evaluator()
-
+    """
     print("Result of the stupid recognizer:")
     # evaluator.printComparison(data.testSet, stupidPred)
     evaluator.printAccuracy(data.testSet, stupidPred)
@@ -60,7 +62,7 @@ def main():
     print("\nResult of the Perceptron recognizer:")
     # evaluator.printComparison(data.testSet, perceptronPred)
     evaluator.printAccuracy(data.testSet, perceptronPred)
-    
+    """
     print("\nResult of the Logistic Regression recognizer:")
     # evaluator.printComparison(data.testSet, perceptronPred)    
     evaluator.printAccuracy(data.testSet, lrPred)

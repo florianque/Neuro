@@ -7,6 +7,8 @@ import numpy as np
 
 from util.activation_functions import Activation
 from model.classifier import Classifier
+#import model.logistic_layer as LogisticLayer
+from model.logistic_layer import LogisticLayer
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.DEBUG,
@@ -47,6 +49,9 @@ class LogisticRegression(Classifier):
         # Initialize the weight vector with small values
         self.weight = 0.01*np.random.randn(self.trainingSet.input.shape[1])
 
+        self.layer = LogisticLayer(self.trainingSet.input.shape[1], 1, activation='sigmoid')
+
+
     def train(self, verbose=True):
         """Train the Logistic Regression.
 
@@ -65,25 +70,26 @@ class LogisticRegression(Classifier):
         while not learned:
             grad = 0
             totalError = 0
-            for input, label in zip(self.trainingSet.input,
-                                    self.trainingSet.label):
-                output = self.fire(input)
-                # compute gradient
-                grad += -(label - output)*input
 
-                # compute recognizing error, not BCE
-                predictedLabel = self.classify(input)
-                error = loss.calculateError(label, predictedLabel)
-                totalError += error
+            for i in range(self.trainingSet.input.shape[1]):
+                target = self.trainingSet.label[i]
+                out = self.layer.forward(self.trainingSet.input[i])
 
-            self.updateWeights(grad)
+                error_derivative=np.divide(out-target,out*(1.0-out))
+                self.layer.computeDerivative(error_derivative)
+                self.layer.updateWeights()
+
+                error = loss.calculateError(out, target)
+
+                totalError += abs(error)
+
+
             totalError = abs(totalError)
             
             iteration += 1
 
             if verbose:
                 logging.info("Epoch: %i; Error: %i", iteration, totalError)
-                
 
             if totalError == 0 or iteration >= self.epochs:
                 # stop criteria is reached
@@ -123,7 +129,7 @@ class LogisticRegression(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, grad):
-        self.weight -= self.learningRate*grad
+        pass
 
     def fire(self, input):
-        return Activation.sigmoid(np.dot(np.array(input), self.weight))
+        return self.layer.forward(input)
